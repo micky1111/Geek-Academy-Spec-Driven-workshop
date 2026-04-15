@@ -33,3 +33,24 @@ python main.py
 ```
 
 On macOS systems where only `python3` is available, run `python3 main.py`.
+
+## Testing
+
+Run the full test suite:
+
+```sh
+pytest
+```
+
+Run only integration tests:
+
+```sh
+pytest tests/integration
+```
+
+## Troubleshooting
+
+- Missing Azure variables: the app will run with heuristic sentiment fallback and print a warning.
+- Empty or malformed responses: verify `data/support_handbook.md` exists and has `##` section headers.
+- Import errors for MAF packages: rerun `python -m pip install -r requirements.txt`.
+- Clarification loop concerns: only one clarification round is allowed; unresolved details escalate automatically.

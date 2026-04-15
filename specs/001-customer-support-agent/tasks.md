@@ -11,11 +11,11 @@
 
 **Purpose**: Prepare Python project dependencies and test scaffold.
 
-- [ ] T001 Add MAF and runtime dependencies in support-agent-python/requirements.txt
-- [ ] T002 Create pytest configuration in support-agent-python/pytest.ini
-- [ ] T003 [P] Create test package marker in support-agent-python/tests/__init__.py
-- [ ] T004 [P] Create unit test package marker in support-agent-python/tests/unit/__init__.py
-- [ ] T005 [P] Create integration test package marker in support-agent-python/tests/integration/__init__.py
+- [x] T001 Add MAF and runtime dependencies in support-agent-python/requirements.txt
+- [x] T002 Create pytest configuration in support-agent-python/pytest.ini
+- [x] T003 [P] Create test package marker in support-agent-python/tests/__init__.py
+- [x] T004 [P] Create unit test package marker in support-agent-python/tests/unit/__init__.py
+- [x] T005 [P] Create integration test package marker in support-agent-python/tests/integration/__init__.py
 
 ---
 
@@ -25,14 +25,14 @@
 
 **CRITICAL**: No user story work starts before this phase is complete.
 
-- [ ] T006 Define core request/response entities in support-agent-python/app/models.py
-- [ ] T007 Implement handbook section parser utility in support-agent-python/app/processor.py
-- [ ] T008 Implement handbook lookup tool function in support-agent-python/app/agent.py
-- [ ] T009 [P] Add Azure OpenAI environment validation in support-agent-python/main.py
-- [ ] T010 [P] Add structured error classes for validation and lookup failures in support-agent-python/app/models.py
-- [ ] T011 Implement base request processing pipeline (parse -> classify -> route) in support-agent-python/app/processor.py
-- [ ] T012 Wire async console loop to processor entrypoint in support-agent-python/main.py
-- [ ] T013 Add shared integration test fixtures for handbook and sample requests in support-agent-python/tests/integration/conftest.py
+- [x] T006 Define core request/response entities in support-agent-python/app/models.py
+- [x] T007 Implement handbook section parser utility in support-agent-python/app/processor.py
+- [x] T008 Implement handbook lookup tool function in support-agent-python/app/agent.py
+- [x] T009 [P] Add Azure OpenAI environment validation in support-agent-python/main.py
+- [x] T010 [P] Add structured error classes for validation and lookup failures in support-agent-python/app/models.py
+- [x] T011 Implement base request processing pipeline (parse -> classify -> route) in support-agent-python/app/processor.py
+- [x] T012 Wire async console loop to processor entrypoint in support-agent-python/main.py
+- [x] T013 Add shared integration test fixtures for handbook and sample requests in support-agent-python/tests/integration/conftest.py
 
 **Checkpoint**: Foundation ready for independent user story delivery.
 
@@ -46,16 +46,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T014 [P] [US1] Add unit tests for missing-field detection in support-agent-python/tests/unit/test_clarification_detection.py
-- [ ] T015 [P] [US1] Add integration test for one-round clarification flow in support-agent-python/tests/integration/test_us1_clarification_flow.py
+- [x] T014 [P] [US1] Add unit tests for missing-field detection in support-agent-python/tests/unit/test_clarification_detection.py
+- [x] T015 [P] [US1] Add integration test for one-round clarification flow in support-agent-python/tests/integration/test_us1_clarification_flow.py
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implement missing information extraction rules in support-agent-python/app/processor.py
-- [ ] T017 [US1] Implement clarification question builder with required_fields in support-agent-python/app/agent.py
-- [ ] T018 [US1] Persist single-round clarification context merge in support-agent-python/app/console_ui.py
-- [ ] T019 [US1] Prevent repeated clarification questions for same request in support-agent-python/app/processor.py
-- [ ] T020 [US1] Render clarification prompts with rationale in support-agent-python/app/renderer.py
+- [x] T016 [US1] Implement missing information extraction rules in support-agent-python/app/processor.py
+- [x] T017 [US1] Implement clarification question builder with required_fields in support-agent-python/app/agent.py
+- [x] T018 [US1] Persist single-round clarification context merge in support-agent-python/app/console_ui.py
+- [x] T019 [US1] Prevent repeated clarification questions for same request in support-agent-python/app/processor.py
+- [x] T020 [US1] Render clarification prompts with rationale in support-agent-python/app/renderer.py
 
 **Checkpoint**: US1 independently functional and testable.
 
@@ -69,16 +69,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T021 [P] [US2] Add unit tests for refund/cancellation policy matching in support-agent-python/tests/unit/test_refund_cancellation_policy.py
-- [ ] T022 [P] [US2] Add integration test for refund/cancellation decision flow in support-agent-python/tests/integration/test_us2_refund_cancellation_flow.py
+- [x] T021 [P] [US2] Add unit tests for refund/cancellation policy matching in support-agent-python/tests/unit/test_refund_cancellation_policy.py
+- [x] T022 [P] [US2] Add integration test for refund/cancellation decision flow in support-agent-python/tests/integration/test_us2_refund_cancellation_flow.py
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Implement refund policy lookup query strategy in support-agent-python/app/agent.py
-- [ ] T024 [US2] Implement cancellation policy lookup query strategy in support-agent-python/app/agent.py
-- [ ] T025 [US2] Implement policy-window and exception routing logic in support-agent-python/app/processor.py
-- [ ] T026 [US2] Add handbook citation injection for refund/cancellation responses in support-agent-python/app/renderer.py
-- [ ] T027 [US2] Implement policy-exception escalation payload construction in support-agent-python/app/models.py
+- [x] T023 [US2] Implement refund policy lookup query strategy in support-agent-python/app/agent.py
+- [x] T024 [US2] Implement cancellation policy lookup query strategy in support-agent-python/app/agent.py
+- [x] T025 [US2] Implement policy-window and exception routing logic in support-agent-python/app/processor.py
+- [x] T026 [US2] Add handbook citation injection for refund/cancellation responses in support-agent-python/app/renderer.py
+- [x] T027 [US2] Implement policy-exception escalation payload construction in support-agent-python/app/models.py
 
 **Checkpoint**: US2 independently functional and testable.
 
@@ -92,16 +92,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T028 [P] [US3] Add unit tests for billing pattern classification in support-agent-python/tests/unit/test_billing_pattern_classification.py
-- [ ] T029 [P] [US3] Add integration test for billing explanation flow in support-agent-python/tests/integration/test_us3_billing_explanations.py
+- [x] T028 [P] [US3] Add unit tests for billing pattern classification in support-agent-python/tests/unit/test_billing_pattern_classification.py
+- [x] T029 [P] [US3] Add integration test for billing explanation flow in support-agent-python/tests/integration/test_us3_billing_explanations.py
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Implement billing-specific entity extraction (amount/date/descriptor) in support-agent-python/app/processor.py
-- [ ] T031 [US3] Implement billing handbook query and ranking rules in support-agent-python/app/agent.py
-- [ ] T032 [US3] Implement known-pattern explanation composer in support-agent-python/app/renderer.py
-- [ ] T033 [US3] Implement unmatched-billing escalation route in support-agent-python/app/processor.py
-- [ ] T034 [US3] Add duplicate-charge false-positive handling from handbook in support-agent-python/app/processor.py
+- [x] T030 [US3] Implement billing-specific entity extraction (amount/date/descriptor) in support-agent-python/app/processor.py
+- [x] T031 [US3] Implement billing handbook query and ranking rules in support-agent-python/app/agent.py
+- [x] T032 [US3] Implement known-pattern explanation composer in support-agent-python/app/renderer.py
+- [x] T033 [US3] Implement unmatched-billing escalation route in support-agent-python/app/processor.py
+- [x] T034 [US3] Add duplicate-charge false-positive handling from handbook in support-agent-python/app/processor.py
 
 **Checkpoint**: US3 independently functional and testable.
 
@@ -115,15 +115,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T035 [P] [US4] Add unit tests for feature/account handbook matching in support-agent-python/tests/unit/test_feature_account_matching.py
-- [ ] T036 [P] [US4] Add integration test for general question handling in support-agent-python/tests/integration/test_us4_general_questions.py
+- [x] T035 [P] [US4] Add unit tests for feature/account handbook matching in support-agent-python/tests/unit/test_feature_account_matching.py
+- [x] T036 [P] [US4] Add integration test for general question handling in support-agent-python/tests/integration/test_us4_general_questions.py
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Implement feature/account intent branch in support-agent-python/app/processor.py
-- [ ] T038 [US4] Implement multi-match narrowing clarification generation in support-agent-python/app/agent.py
-- [ ] T039 [US4] Implement direct instruction rendering for handbook FAQ answers in support-agent-python/app/renderer.py
-- [ ] T040 [US4] Implement handbook-gap escalation for general questions in support-agent-python/app/processor.py
+- [x] T037 [US4] Implement feature/account intent branch in support-agent-python/app/processor.py
+- [x] T038 [US4] Implement multi-match narrowing clarification generation in support-agent-python/app/agent.py
+- [x] T039 [US4] Implement direct instruction rendering for handbook FAQ answers in support-agent-python/app/renderer.py
+- [x] T040 [US4] Implement handbook-gap escalation for general questions in support-agent-python/app/processor.py
 
 **Checkpoint**: US4 independently functional and testable.
 
@@ -137,15 +137,15 @@
 
 ### Tests for User Story 5
 
-- [ ] T041 [P] [US5] Add unit tests for emotional signal detection in support-agent-python/tests/unit/test_emotional_signal_detection.py
-- [ ] T042 [P] [US5] Add integration test for escalation routing and payload in support-agent-python/tests/integration/test_us5_escalation_routing.py
+- [x] T041 [P] [US5] Add unit tests for emotional signal detection in support-agent-python/tests/unit/test_emotional_signal_detection.py
+- [x] T042 [P] [US5] Add integration test for escalation routing and payload in support-agent-python/tests/integration/test_us5_escalation_routing.py
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implement keyword-based escalation signal detection in support-agent-python/app/processor.py
-- [ ] T044 [US5] Implement LLM sentiment scoring integration for escalation confidence in support-agent-python/app/agent.py
-- [ ] T045 [US5] Implement escalation reason taxonomy mapping in support-agent-python/app/models.py
-- [ ] T046 [US5] Render empathetic escalation response with next-steps expectation in support-agent-python/app/renderer.py
+- [x] T043 [US5] Implement keyword-based escalation signal detection in support-agent-python/app/processor.py
+- [x] T044 [US5] Implement LLM sentiment scoring integration for escalation confidence in support-agent-python/app/agent.py
+- [x] T045 [US5] Implement escalation reason taxonomy mapping in support-agent-python/app/models.py
+- [x] T046 [US5] Render empathetic escalation response with next-steps expectation in support-agent-python/app/renderer.py
 
 **Checkpoint**: US5 independently functional and testable.
 
@@ -159,14 +159,14 @@
 
 ### Tests for User Story 6
 
-- [ ] T047 [P] [US6] Add unit tests for response coherence template selection in support-agent-python/tests/unit/test_response_coherence.py
-- [ ] T048 [P] [US6] Add integration test for single-conversation narrative continuity in support-agent-python/tests/integration/test_us6_single_conversation_experience.py
+- [x] T047 [P] [US6] Add unit tests for response coherence template selection in support-agent-python/tests/unit/test_response_coherence.py
+- [x] T048 [P] [US6] Add integration test for single-conversation narrative continuity in support-agent-python/tests/integration/test_us6_single_conversation_experience.py
 
 ### Implementation for User Story 6
 
-- [ ] T049 [US6] Implement conversation summary synthesis from request context in support-agent-python/app/renderer.py
-- [ ] T050 [US6] Implement consistent response envelope (understood -> action -> next step) in support-agent-python/app/renderer.py
-- [ ] T051 [US6] Integrate branch-specific personalization signals into final message generation in support-agent-python/app/processor.py
+- [x] T049 [US6] Implement conversation summary synthesis from request context in support-agent-python/app/renderer.py
+- [x] T050 [US6] Implement consistent response envelope (understood -> action -> next step) in support-agent-python/app/renderer.py
+- [x] T051 [US6] Integrate branch-specific personalization signals into final message generation in support-agent-python/app/processor.py
 
 **Checkpoint**: US6 independently functional and testable.
 
@@ -176,11 +176,11 @@
 
 **Purpose**: Final consistency, performance, and docs across all user stories.
 
-- [ ] T052 [P] Add end-to-end regression tests using sample requests in support-agent-python/tests/integration/test_regression_sample_requests.py
-- [ ] T053 [P] Add unit tests for handbook parser robustness in support-agent-python/tests/unit/test_handbook_parser_robustness.py
-- [ ] T054 Optimize handbook lookup performance for <5s response target in support-agent-python/app/agent.py
-- [ ] T055 Update run instructions and troubleshooting notes in support-agent-python/README.md
-- [ ] T056 Run quickstart validation and record expected command outputs in specs/001-customer-support-agent/quickstart.md
+- [x] T052 [P] Add end-to-end regression tests using sample requests in support-agent-python/tests/integration/test_regression_sample_requests.py
+- [x] T053 [P] Add unit tests for handbook parser robustness in support-agent-python/tests/unit/test_handbook_parser_robustness.py
+- [x] T054 Optimize handbook lookup performance for <5s response target in support-agent-python/app/agent.py
+- [x] T055 Update run instructions and troubleshooting notes in support-agent-python/README.md
+- [x] T056 Run quickstart validation and record expected command outputs in specs/001-customer-support-agent/quickstart.md
 
 ---
 

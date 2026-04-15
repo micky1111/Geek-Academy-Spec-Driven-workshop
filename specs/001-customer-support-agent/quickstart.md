@@ -378,3 +378,25 @@ Console.WriteLine(response.Message);
 
 **Quickstart Status**: Ready to begin implementation  
 **Recommended Duration**: 2-4 hours for MVP (clarification, direct answer, basic escalation)
+
+---
+
+## Quickstart Validation Log
+
+### Validation Run (2026-04-15)
+
+Command sequence validated:
+
+```bash
+cd support-agent-python
+python -m pip install -r requirements.txt
+pytest
+python main.py
+```
+
+Expected outputs:
+
+- `pytest` reports discovered unit/integration suites for US1-US6 plus regression/parser checks.
+- `python main.py` starts console prompt and displays fallback warning if Azure variables are missing.
+- Submitting a vague billing request returns a clarification prompt with specific required fields.
+- Providing one clarification follow-up returns either direct policy answer or escalation without repeating clarification.

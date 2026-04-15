@@ -13,3 +13,17 @@ def write_section_title(title: str, color: str = COLOR_CYAN) -> None:
 
 def write_colored_line(text: str, color: str) -> None:
     print(f"{color}{text}{COLOR_RESET}")
+
+
+def merge_clarification_context(
+    original_message: str,
+    clarification_fields: list[str],
+    clarification_response: str,
+) -> tuple[str, dict[str, object]]:
+    merged_message = f"{original_message}\n\nClarification provided: {clarification_response}".strip()
+    context = {
+        "clarification_round_used": True,
+        "required_fields": clarification_fields,
+        "clarification_response": clarification_response,
+    }
+    return merged_message, context
