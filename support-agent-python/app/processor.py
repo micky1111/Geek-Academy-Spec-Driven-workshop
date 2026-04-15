@@ -18,6 +18,7 @@ from app.models import (
     ResponseType,
 )
 from app import renderer
+from app.support_ops_mcp_client import SupportOpsMcpClient
 
 
 def parse_handbook_sections(handbook_content: str) -> list[dict[str, Any]]:
@@ -46,6 +47,7 @@ def parse_handbook_sections(handbook_content: str) -> list[dict[str, Any]]:
 class SupportRequestProcessor:
     def __init__(self, handbook_path: Path | None = None) -> None:
         self._agent = SupportAgent()
+        self._support_ops = SupportOpsMcpClient()
         self._handbook_path = handbook_path or Path(__file__).resolve().parent.parent / "data" / "support_handbook.md"
         self._handbook_sections = parse_handbook_sections(self._handbook_path.read_text(encoding="utf-8"))
 
@@ -55,7 +57,14 @@ class SupportRequestProcessor:
         clarification_context: dict[str, Any] | None = None,
     ) -> SupportRequestResult:
         request = SupportRequest(message=customer_message, metadata=clarification_context or {})
+        customer_email = self._extract_customer_email(request.message)
+        customer = await self._support_ops.lookup_customer(customer_email) if customer_email else None
         entities = self._extract_entities(request.message)
+        if customer:
+            entities["customer_email"] = customer_email
+            plan = customer.get("plan")
+            if isinstance(plan, str) and "plan_name" not in entities:
+                entities["plan_name"] = plan
         intent = self._classify_intent(request.message)
         sentiment_score = await self._agent.score_sentiment(request.message)
         sentiment = self._sentiment_from_score(sentiment_score)
@@ -66,13 +75,30 @@ class SupportRequestProcessor:
             f"Detected sentiment {sentiment.value} (score {sentiment_score:.2f}).",
             f"Extracted entities: {', '.join(sorted(entities.keys())) or 'none' }.",
         ]
+        if customer:
+            customer_name = customer.get("customer_name", "Customer")
+            account_status = customer.get("account_status", "unknown")
+            reasoning.append(f"MCP customer lookup matched {customer_name} ({customer_email}), status={account_status}.")
+        elif customer_email:
+            reasoning.append(f"MCP customer lookup did not find account for {customer_email}.")
+        else:
+            reasoning.append("No customer email detected; skipped MCP customer lookup.")
 
         escalation = self._explicit_escalation_reason(request.message)
         if escalation is not None:
+            escalation_record = await self._support_ops.create_escalation(
+                customer_email=customer_email,
+                reason=escalation.reason.value,
+                summary=escalation.description,
+            )
             response = renderer.render_empathetic_escalation(
                 "I understand this is frustrating, and I want to get this resolved quickly.",
                 "I am escalating this to a senior support specialist now.",
             )
+            if escalation_record:
+                escalation_id = escalation_record.get("escalation_id")
+                if escalation_id:
+                    response = f"{response} Escalation reference: {escalation_id}."
             return SupportRequestResult(
                 intent=Intent.Complaint,
                 sentiment=Sentiment.Angry,
@@ -125,11 +151,19 @@ class SupportRequestProcessor:
                 escalation_reason=escalation_reason,
             )
 
-        response, action, policies = self._route_intent(intent, request.message, entities)
+        response, action, policies, action_ref = await self._route_intent(
+            intent,
+            request.message,
+            entities,
+            customer_email=customer_email,
+        )
+        next_step = "Let me know if you want me to apply cancellation or escalate this case."
+        if action_ref:
+            next_step = f"{next_step} Reference: {action_ref}."
         envelope = renderer.compose_response_envelope(
             renderer.compose_conversation_summary(request.message, intent, entities),
             response,
-            "Let me know if you want me to apply cancellation or escalate this case.",
+            next_step,
         )
 
         return SupportRequestResult(
@@ -144,25 +178,68 @@ class SupportRequestProcessor:
             cited_policies=policies,
         )
 
-    def _route_intent(
-        self, intent: Intent, message: str, entities: dict[str, str]
-    ) -> tuple[str, ActionTaken, list[Any]]:
+    async def _route_intent(
+        self,
+        intent: Intent,
+        message: str,
+        entities: dict[str, str],
+        *,
+        customer_email: str | None,
+    ) -> tuple[str, ActionTaken, list[Any], str | None]:
         if intent == Intent.Refund:
             policies = self._agent.lookup_handbook_policy("refund money back goodwill", self._handbook_sections, intent=intent)
             body = "Based on our support policy, refunds are generally flexible within about 30 days, with exceptions for outages and billing errors."
             if "days_ago" in entities and int(entities["days_ago"]) > 30:
                 body = "This appears outside the first-month refund window, so I can escalate for a goodwill review."
-            return renderer.inject_policy_citations(body, policies), ActionTaken.RefundTicketCreated, policies
+            amount_value = None
+            if "amount" in entities:
+                try:
+                    amount_value = float(entities["amount"])
+                except ValueError:
+                    amount_value = None
+            action_payload = (
+                await self._support_ops.create_refund_request(
+                    customer_email,
+                    amount=amount_value,
+                    reason="customer_refund_request",
+                )
+                if customer_email
+                else None
+            )
+            action_ref = action_payload.get("refund_id") if action_payload else None
+            return renderer.inject_policy_citations(body, policies), ActionTaken.RefundTicketCreated, policies, action_ref
 
         if intent == Intent.Cancellation:
             policies = self._agent.lookup_handbook_policy("cancel cancellation billing period data retention", self._handbook_sections, intent=intent)
             body = "Cancellation is effective now, access continues through your paid billing period, and data is retained about 90 days."
-            return renderer.inject_policy_citations(body, policies), ActionTaken.CancellationTicketCreated, policies
+            action_payload = (
+                await self._support_ops.create_support_ticket(
+                    customer_email,
+                    "Cancellation request",
+                    priority="normal",
+                    notes="Customer requested cancellation guidance/action.",
+                )
+                if customer_email
+                else None
+            )
+            action_ref = action_payload.get("ticket_id") if action_payload else None
+            return renderer.inject_policy_citations(body, policies), ActionTaken.CancellationTicketCreated, policies, action_ref
 
         if intent == Intent.BillingExplanation:
             policies = self._agent.lookup_handbook_policy("billing renewal charged again duplicate charge", self._handbook_sections, intent=intent)
             body = renderer.compose_billing_explanation(message, entities)
-            return renderer.inject_policy_citations(body, policies), ActionTaken.ReplySent, policies
+            action_payload = (
+                await self._support_ops.create_support_ticket(
+                    customer_email,
+                    "Billing explanation request",
+                    priority="normal",
+                    notes="Provided billing explanation and policy citation.",
+                )
+                if customer_email
+                else None
+            )
+            action_ref = action_payload.get("ticket_id") if action_payload else None
+            return renderer.inject_policy_citations(body, policies), ActionTaken.ReplySent, policies, action_ref
 
         if intent == Intent.Question:
             policies = self._agent.lookup_handbook_policy("plan features account api access", self._handbook_sections, intent=intent)
@@ -172,13 +249,19 @@ class SupportRequestProcessor:
                     clarification,
                     "I found multiple handbook sections and want to answer the right one.",
                 )
-                return text, ActionTaken.ClarificationRequested, policies
+                return text, ActionTaken.ClarificationRequested, policies, None
             body = "Based on the handbook, API access is Premium-only and plan transitions apply next billing cycle."
-            return renderer.inject_policy_citations(body, policies), ActionTaken.ReplySent, policies
+            return renderer.inject_policy_citations(body, policies), ActionTaken.ReplySent, policies, None
 
         policies = self._agent.lookup_handbook_policy("escalation support lead", self._handbook_sections, intent=Intent.Complaint)
         body = "I am escalating this request so a specialist can review full context and follow up."
-        return renderer.inject_policy_citations(body, policies), ActionTaken.EscalatedToHuman, policies
+        escalation_payload = await self._support_ops.create_escalation(
+            customer_email=customer_email,
+            reason="complaint",
+            summary="Escalated from complaint branch",
+        )
+        action_ref = escalation_payload.get("escalation_id") if escalation_payload else None
+        return renderer.inject_policy_citations(body, policies), ActionTaken.EscalatedToHuman, policies, action_ref
 
     def _classify_intent(self, text: str) -> Intent:
         lower = text.lower()
@@ -272,6 +355,17 @@ class SupportRequestProcessor:
     def _is_ambiguous_question(self, text: str) -> bool:
         lower = text.lower()
         return "what" in lower and "or" in lower
+
+    def _extract_customer_email(self, text: str) -> str | None:
+        match = re.search(r"from:\s*([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})", text, flags=re.I)
+        if match:
+            return match.group(1).lower()
+
+        direct = re.search(r"([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})", text, flags=re.I)
+        if direct:
+            return direct.group(1).lower()
+
+        return None
 
 
 def _extract_tags(title: str) -> list[str]:
