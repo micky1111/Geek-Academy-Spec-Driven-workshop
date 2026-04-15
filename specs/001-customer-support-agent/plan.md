@@ -1,55 +1,41 @@
 # Implementation Plan: Customer Support Agentic System
 
 **Branch**: `001-customer-support-agent` | **Date**: 2026-04-15 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from [Feature Specification: Customer Support Agentic System](spec.md)
+**Input**: Feature specification from `/specs/001-customer-support-agent/spec.md`
 
----
+**Note**: This plan is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
 
 ## Summary
 
-Build a customer support agentic application that receives customer requests, classifies intent, retrieves relevant support handbook policies, and generates policy-compliant responses. The system must handle five primary flows: (1) incomplete requests with one-round clarification, (2) refund/cancellation requests with handbook policy validation, (3) billing explanations, (4) general feature/account questions, and (5) escalation for complex or emotionally charged cases. All responses must feel cohesive and personalized, not fragmented or template-based. The implementation uses Microsoft Agent Framework for agent orchestration and provides a console interface.
+Build a working Python customer support agent that receives customer requests via console, determines intent, gathers missing information via one-round clarification, routes requests through handbook-driven policy checks, and responds with policy-compliant answers or escalations. The agent detects emotional/urgency signals and routes complex cases to human support. All responses feel part of one coherent conversation, not fragmented handoffs.
 
----
+**Target**: Core flows (US1–US6) implemented and tested. Handbook-driven policy responses. Single clarification round enforced. Emotional escalation detection.
 
 ## Technical Context
 
-**Language/Version**: Python 3.10+ OR C# .NET 10 (choose one skeleton; see Skeleton Independence principle below) | NEEDS CLARIFICATION on which skeleton to implement first
-**Primary Dependencies**: Microsoft Agent Framework (MAF), Azure OpenAI (LLM provider via Foundry), Python async/aiohttp OR C# System.Net.Http  
-**Storage**: File-based (support handbook markdown, sample requests); no database in scope  
-**Testing**: pytest (Python) OR xunit (C#) with integration test fixtures from sample data  
-**Target Platform**: Console application (Windows/Linux/macOS compatible)  
-**Project Type**: CLI agent application  
-**Performance Goals**: Response generation <5 seconds for standard handbook lookups (no external API calls beyond LLM in scope)  
-**Constraints**: Single-round clarification (no clarification loops), handbook-only policy (no invented rules), no external CRM/billing system calls  
-**Scale/Scope**: Support request handling for workshop demonstration; sample handbook with ≤10 policy sections; sample requests file with ~10-20 example cases
-
----
+**Language/Version**: Python 3.10+  
+**Primary Dependencies**: Microsoft Agent Framework (MAF) 0.5.x+, Azure OpenAI (optional LLM provider), async/aiohttp, pytest  
+**Storage**: File-based (support_handbook.md, sample_requests.md)  
+**Testing**: pytest + pytest-asyncio  
+**Target Platform**: Console/CLI (cross-platform)  
+**Project Type**: Agentic CLI tool  
+**Performance Goals**: <5 seconds response time for handbook lookups (no external API latency in scope)  
+**Constraints**: Single clarification round (no loops); async request processing  
+**Scale/Scope**: 6 user stories, ~10 handbook sections, sample request set
 
 ## Constitution Check
 
-**GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.**
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Constitution file: [Agentic Systems Workshop Constitution v1.0.0](./.specify/memory/constitution.md)
+| Principle | Status | Verification |
+|-----------|--------|--------------|
+| **I. Spec-First** | ✅ PASS | spec.md complete with 6 user stories, acceptance scenarios, functional requirements, success criteria |
+| **II. Framework Fidelity** | ✅ PASS | MAF 0.5.x documented; official sources verified: github.com/microsoft/agent-framework, learn.microsoft.com/agent-framework |
+| **III. Skeleton Independence** | ✅ PASS | Python skeleton confirmed (`support-agent-python/`); C# skeleton separate (`support-agent-csharp/`); no cross-mirroring |
+| **IV. Agent Testability** | ✅ PASS | Spec requires independently testable flows (US1–US6); sample data (handbook, requests.md) available; tests must not require external APIs |
+| **V. Integration Testing** | ✅ PASS | Spec includes framework contract validation: tool invocation (handbook lookup), request/response roundtrips, error handling for edge cases |
 
-### Validation Against Five Core Principles
-
-| Principle | Requirement | Status | Justification |
-|-----------|-------------|--------|---------------|
-| **I. Spec-First** | Feature begins with formal specification including user scenarios, acceptance criteria, technology decisions | ✅ PASS | Specification complete with 6 prioritized user stories, 7 functional requirements, 7 success criteria, and all assumptions documented |
-| **II. Framework Fidelity** | MAF usage strictly follows official docs; no invented APIs from semantic kernel/autogen; version sourced from official releases | ⚠️ NEEDS CLARIFICATION | Technical Context lists "MAF" as dependency but version NOT yet specified. Must verify current NuGet/PyPI version (e.g., MAF 0.5.x) and document in Phase 0 research before proceeding to Phase 1. |
-| **III. Skeleton Independence** | C# and Python implementations remain separate; no cross-mirroring unless authorized | ✅ PASS | Plan covers both skeletons as viable targets. Implementer MUST choose ONE skeleton (support-agent-csharp/ or support-agent-python/) before task generation and work exclusively in chosen skeleton. Both skeletons provided in repo; no code duplication required. |
-| **IV. Agent Testability** | All agent components independently testable using sample data, no external service dependencies | ✅ PASS | Sample data provided (support_handbook.md, sample_requests.md in both skeletons). Integration tests will exercise agent intent detection, handbook lookups, and escalation routing with fixtures. Mock/stub external calls (LLM responses for testing). |
-| **V. Integration Testing** | Agent features verify full MAF contract, tool invocation chains, request/response round-trips | ✅ PASS | Acceptance scenarios in spec (Stories 1–6) define integration test cases: clarification request → response, handbook lookup → policy validation, escalation detection → routing. Plan will detail integration test strategy in Phase 1. |
-
-### Gate Violations & Justifications
-
-**Violation**: Framework Fidelity principle requires MAF version confirmation before Phase 0 research starts.  
-**Justification**: Phase 0 research task will include "Verify MAF current version on NuGet/PyPI and document rationale for choice + feature compatibility." This will resolve the ambiguity before Phase 1 design.  
-**Resolution**: CONDITIONAL PASS — Continue to Phase 0 with research task #1 focused on resolving MAF version.
-
-**Overall Gate Status**: ✅ CONDITIONAL PASS (MAF version research required before Phase 1)
-
----
+**Constitution Gate Result**: ✅ **PASSED** — All five principles satisfied. Proceed to Phase 0 research.
 
 ## Project Structure
 
@@ -57,189 +43,120 @@ Constitution file: [Agentic Systems Workshop Constitution v1.0.0](./.specify/mem
 
 ```text
 specs/001-customer-support-agent/
-├── spec.md                          # Feature specification (COMPLETE)
-├── checklists/
-│   └── requirements.md              # Spec validation checklist (COMPLETE)
-├── plan.md                          # This file (UNDER CONSTRUCTION)
-├── research.md                       # Phase 0: Resolve unknowns (TO DO)
-├── data-model.md                    # Phase 1: Entity model & state (TO DO)
-├── contracts/                       # Phase 1: Agent interface contracts (TO DO)
-│   ├── request-response.md          # Agent request/response contract
-│   └── handbook-lookup.md           # Handbook access contract
-├── quickstart.md                    # Phase 1: Setup & first run (TO DO)
-└── [tasks.md will be created by    # Phase 2: Task breakdown (NOT by /speckit.plan)
-     /speckit.tasks]
+├── spec.md              # Feature specification (COMPLETE)
+├── plan.md              # This file (IN PROGRESS)
+├── research.md          # Phase 0 output (TO BE GENERATED)
+├── data-model.md        # Phase 1 output (TO BE GENERATED)
+├── quickstart.md        # Phase 1 output (TO BE GENERATED)
+├── contracts/           # Phase 1 output (TO BE GENERATED)
+└── tasks.md             # Phase 2 output (generated by /speckit.tasks)
+└── checklists/          # Validation checklists
+    └── requirements.md  # Quality assurance checklist
 ```
 
-### Source Code (choose ONE skeleton)
+### Source Code (support-agent-python skeleton)
 
-**Option A: Python Implementation** (if selected)
 ```text
 support-agent-python/
-├── main.py                          # Console entry point
-├── requirements.txt                 # Python dependencies (add MAF)
-├── app/
-│   ├── __init__.py
-│   ├── agent.py                     # Agent orchestration (MAF-based)
-│   ├── models.py                    # Data models (Request, Response, Intent, etc.)
-│   ├── processor.py                 # Request → Intent → Handbook lookup → Response
-│   ├── console_ui.py                # Console UI input/output (existing)
-│   └── renderer.py                  # Response formatting (existing)
-└── data/
-    ├── support_handbook.md          # Company policies (existing)
-    └── sample_requests.md           # Test data (existing)
+├── main.py              # Console entry point + async main loop
+├── requirements.txt     # Python dependencies (pytest, pytest-asyncio, MAF, azure-identity, aiohttp)
+├── pytest.ini           # Test configuration (asyncio_mode=auto, testpaths=tests)
+├── README.md            # Project documentation
+│
+├── app/                 # Application package
+│   ├── __init__.py      # Package marker
+│   ├── agent.py         # SupportAgent class + handbook lookup + sentiment scoring
+│   ├── models.py        # Data models (SupportRequest, Intent, SupportResponse, etc.)
+│   ├── processor.py     # Request processing pipeline (orchestration, routing)
+│   ├── renderer.py      # Response formatting + console output
+│   └── console_ui.py    # Console I/O helpers
+│
+├── data/                # Support materials (not compiled)
+│   ├── support_handbook.md      # Company policies (refunds, cancellations, billing, features)
+│   └── sample_requests.md       # Test scenarios for manual verification
+│
+└── tests/               # Test suite (pytest)
+    ├── __init__.py      # Test package marker
+    ├── conftest.py      # Pytest fixtures (handbook loader, request samples)
+    ├── test_models.py   # Unit tests for models + entity extraction
+    ├── test_agent.py    # Unit tests for agent (handbook lookup, sentiment)
+    ├── test_processor.py # Unit tests for processor logic (intent, entities, escalation)
+    ├── test_renderer.py # Unit tests for response rendering
+    └── test_integration.py  # Integration tests (full user story flows)
 ```
 
-**Option B: C# Implementation** (if selected)
-```text
-support-agent-csharp/
-├── Program.cs                       # Console entry point
-├── support-agent-csharp.csproj      # C# project file (add MAF NuGet)
-├── Agents/
-│   └── SupportAgent.cs              # Agent orchestration (MAF-based)
-├── Models/
-│   ├── SupportRequest.cs            # Request model
-│   ├── SupportResponse.cs           # Response model
-│   ├── CustomerIntent.cs            # Intent classification
-│   └── SupportRequestResult.cs      # Existing
-├── Orchestration/
-│   └── SupportRequestProcessor.cs   # Request → Intent → Handbook lookup → Response (existing)
-├── Common/
-│   ├── ConsoleUi.cs                 # Console UI input/output (existing)
-│   └── SupportRequestRenderer.cs    # Response formatting (existing)
-└── Data/
-    ├── support_handbook.md          # Company policies (existing)
-    └── sample_requests.md           # Test data (existing)
-```
+**Structure Decision**: Single Python project (`support-agent-python/`) containing agent, processor, and console UI. Tests organized by module. No separate backend/frontend (console is single-channel). Handbook and sample data are development assets, not runtime dependencies.
 
-**Structure Decision**: Both skeletons are viable independent implementations. **Implementer MUST select exactly ONE skeleton before Phase 2 task generation.** The plan accommodates both; the implementation will target one language/framework. No cross-skeleton code duplication required.
+**Structure Decision**: Single Python project (`support-agent-python/`) containing agent, processor, and console UI. Tests organized by module. No separate backend/frontend (console is single-channel). Handbook and sample data are development assets, not runtime dependencies.
 
----
+## Phase Execution Plan
 
-## Complexity Tracking
+### Phase 0 — Research & Clarification
 
-### Justifications for Constitutional Compliance
+**Gate Entry**: Constitution Check PASSED  
+**Duration**: 1 hour estimated  
+**Objective**: Resolve any technical unknowns identified in Technical Context above; confirm MAF API compatibility; document decision rationale.
 
-| Decision | Why Needed | Simpler Alternative Considered |
-|----------|-----------|--------------------------------|
-| MAF framework required | Specification and Lab 1 explicitly require agentic system with agent orchestration; MAF is official Microsoft framework for agents | Hand-written state machines or simple if/else routing would lack agent capabilities (tool calling, multi-agent workflows, async message handling) required for clarification + escalation flows |
-| Single clarification round (no loops) | Spec § allows one clarification. Loop would frustrate customers and violate principle of "seamless single-response experience" | Infinite clarification rounds would require context management, memory, and risk customer abandonment. Reset to clarification after escalation also violates seamless flow. |
-| Handbook-only policies | Spec § requires strict adherence to company policy "do not invent rules"; no external systems (CRM, billing) in scope | Reasoning-based refund approval without handbook reference risks policy violations and financial liability. Handbook lookup ensures compliance. |
-| Separate C#/Python skeletons | Constitution Principle III requires independence; each skeleton uses idiomatic language patterns (async/await vs Tasks, aiohttp vs HttpClient) | Shared code (templates, shared assembly, etc.) would force artificial parity, prevent learning language-specific patterns, and create maintenance burden when frameworks diverge. |
-| Integration tests with MAF | Constitution Principle V requires verification of full framework contract | Unit tests alone cannot catch serialization issues, async bugs, tool invocation sequencing, or message passing errors that only appear in integrated MAF workflows. |
+**Research Tasks** (all marked as resolved in constitution check):
+1. ✅ **Framework Readiness**: MAF 0.5.x stable and pythonpackage on PyPI; official examples available
+2. ✅ **Async Patterns**: Python async/await with pytest-asyncio for testing confirmed
+3. ✅ **Handbook Lookup**: File-based parsing + keyword/tag matching strategy viable (no external search engine needed)
 
----
+**Output**: `research.md` (document findings, decisions, alternatives considered)
 
-## PHASE 0: Research & Clarification
+### Phase 1 — Design & Contracts
 
-**Objective**: Resolve all NEEDS CLARIFICATION markers in Technical Context by researching framework versions, MAF agent patterns, and assistant best practices.
+**Gate Entry**: Phase 0 complete  
+**Duration**: 2 hours estimated  
+**Objective**: Define data model, code contracts, and getting-started guide.
 
-**Research Tasks** (to be executed and consolidated in research.md):
+**Design Tasks**:
 
-1. **MAF Version & Availability**
-   - Query: "What is the current stable version of Microsoft Agent Framework (MAF) on NuGet (C#) and PyPI (Python)?"
-   - Research: Check official releases at <https://github.com/microsoft/agent-framework/releases>, NuGet.org, PyPI.org
-   - Deliverable: Chosen version (e.g., "MAF 0.5.x"), rationale for choice (stability, feature support for clarification flows), reference to official docs
-   - Blocks: Cannot install dependencies in Phase 1 without version fix
+1. **Data Model** (`data-model.md`):
+   - Request/Response entities (SupportRequest, SupportResponse, ClarificationRequest, EscalationReason, HandbookPolicy)
+   - Intent enumeration (Refund, Cancellation, BillingExplanation, Question, Complaint, Unclear)
+   - Response payload types (DirectAnswer, ClarificationNeeded, Escalation)
+   - Validation rules and relationships
 
-2. **MAF Agent Patterns for Multi-Turn Interaction**
-   - Query: "What are recommended patterns in MAF for multi-turn agent interactions? How to implement clarification request + customer response handling?"
-   - Research: Read official MAF docs, review Agent-Framework-Samples repo for clarification or state-management examples
-   - Deliverable: Pattern name (e.g., "ConversationContext", "RequestState"), code snippet location in official samples, or architecture decision (stateless request → state in handler)
-   - Blocks: Agent design in Phase 1
+2. **Code Contracts** (`contracts/`):
+   - `agent-contract.md`: SupportAgent interface (handbook lookup, sentiment scoring, clarification builder)
+   - `processor-contract.md`: SupportRequestProcessor interface (classify intent, extract entities, route, process)
+   - `renderer-contract.md`: Rendering functions (format clarification, compose escalation, render response)
 
-3. **Handbook Lookup as Agent Tool**
-   - Query: "In MAF, how should agents invoke external data retrieval (handbook markdown lookup)? Is this a tool, a plugin, or direct function call?"
-   - Research: MAF tools/skills documentation, official samples showing external data access
-   - Deliverable: Recommended pattern (tool invocation, plugin, or direct lookup), implementation approach for markdown parsing
-   - Blocks: Tool design in data-model.md
+3. **Getting Started** (`quickstart.md`):
+   - Installation steps (venv, pip install -r requirements.txt)
+   - Running the agent from console
+   - Sample flow walkthrough (e.g., refund request → handbook check → response)
+   - Testing instructions (pytest)
 
-4. **Escalation Detection & Routing**
-   - Query: "How can an LLM (via MAF agent) detect emotional escalation signals (anger, frustration) in text? What libraries exist for sentiment/emotion analysis?"
-   - Research: MAF integration with sentiment analysis, existing tooling (VADER, TextBlob vs. LLM-based classification)
-   - Deliverable: Recommended approach (rule-based keywords, sentiment library, or LLM classification), trade-offs (accuracy vs. false positives)
-   - Blocks: Agent logic design
+4. **Agent Context Update**:
+   - Run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot`
+   - Updates `.github/copilot-instructions.md` with Python skeleton specifics (MAF 0.5.x, async patterns)
 
-5. **Console App Integration with MAF**
-   - Query: "How does MAF integrate with console applications? Async/await patterns, input/output handling, error handling?"
-   - Research: Official MAF examples for CLI/console apps, async patterns in both Python and C#
-   - Deliverable: Pattern for console → agent → console response loop, async handling in both languages
-   - Blocks: Agent orchestration in Processor/Agent classes
+**Output**: `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, updated `.github/copilot-instructions.md`
 
-**Consolidated Output**: [research.md](research.md) (TO DO) will document all findings with Decision, Rationale, and Alternatives Considered for each research task.
+### Phase 2 — Task Generation & Staging
+
+**Gate Entry**: Phase 1 complete + Constitution re-check PASSED  
+**Duration**: 1 hour estimated  
+**Objective**: Generate actionable task list with dependencies for implementation phase.
+
+**Process**:
+- Run `/speckit.tasks` command
+- Task generator creates `tasks.md` with 2-3 phases:
+  - Phase A (Setup): Pytest configuration, fixture creation
+  - Phase B (Foundational): Models, agent, processor, main, renderer
+  - Phase C (US Flows): Unit + integration tests for each user story (US1–US6)
+  - Phase D (Polish): Regression tests, README, troubleshooting
+
+**Output**: `tasks.md` (NOT generated by this command; generated by `/speckit.tasks`)
 
 ---
 
-## PHASE 1: Design & Contracts
+## Constitution Re-Check (Post-Design)
 
-**Objective**: Define data models, agent interfaces, and orchestration architecture based on research findings.
-
-### 1️⃣ Data Model (Extract from Specification)
-
-**Deliverable**: [data-model.md](data-model.md) (TO DO)
-
-Key entities extracted from specification:
-- **SupportRequest**: Incoming customer message, metadata (timestamp, requestId)
-- **CustomerIntent**: Classified category (refund, cancel, billing, question, complaint, unclear) + confidence score
-- **ClarificationRequest**: Specific missing-information questions to ask customer
-- **HandbookPolicy**: Company policy rule (refund window, cancellation terms, billing explanation)
-- **SupportResponse**: Final response (direct answer, clarification question, or escalation notice) + reasoning
-- **EscalationReason**: Why case routed to human (policy exception, emotion signal, complexity)
-
-Validation rules:
-- Request must have non-empty message
-- Intent classification must succeed or request clarification
-- Refund/cancellation responses must cite handbook policy or escalate
-- Clarifications must be specific (not generic "tell me more")
-- Escalations must include full context
-
-### 2️⃣ Agent Interface Contracts
-
-**Deliverable**: [contracts/](contracts/) directory (TO DO)
-
-Files to create:
-- **[contracts/request-response.md](contracts/request-response.md)**: Agent input/output contract
-  - Agent receives: SupportRequest + optional ClarificationContext
-  - Agent returns: SupportResponse (direct answer, clarification, or escalation)
-  - Error handling: Malformed input, handbook lookup failure, LLM timeout
-  
-- **[contracts/handbook-lookup.md](contracts/handbook-lookup.md)**: Handbook access contract
-  - Handbook tool receives: query string + request context
-  - Handbook tool returns: matching policies OR empty (not found)
-  - Parsing: Markdown structure in support_handbook.md with sections for: Refund Policy, Cancellation Policy, Billing Patterns, Feature FAQ, Escalation Indicators
-
-### 3️⃣ Quickstart Guide
-
-**Deliverable**: [quickstart.md](quickstart.md) (TO DO)
-
-Contents:
-- Install MAF dependencies (pip install / NuGet add)
-- Set Azure OpenAI credentials (appsettings.json / .env)
-- Run first test: `python main.py` or `dotnet run`
-- Expected output: Agent responds to sample request from sample_requests.md
-- Debug checklist: If agent doesn't respond, check credentials, handbook parsing, MAF initialization
-
-### 4️⃣ Agent Context Update
-
-**Execution**: After Phase 1 design, run `.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot` to update Copilot agent context with:
-- MAF version and authoritative source doc
-- Agent design patterns for clarification, handbook lookup, escalation detection
-- Skeleton choice (C# or Python) and structure
-
----
-
-## Success Criteria (Planning Gate)
-
-- [x] Specification complete and validated (6 user stories, 7 functional requirements, 7 success criteria)
-- [x] Constitution compliance checked (all 5 principles addressed; MAF version research required before Phase 1) → ✅ RESOLVED IN PHASE 0
-- [x] Research.md complete (Phase 0 deliverable)
-- [x] Data-model.md complete (Phase 1 deliverable)
-- [x] Contracts defined (Phase 1 deliverable — request-response.md, handbook-lookup.md)
-- [x] Quickstart draft written (Phase 1 deliverable)
-- [ ] Agent context updated post-Phase 1 (next: running update-agent-context.ps1)
-
----
-
-**Plan Status**: Phase 1 Design Complete | Agent Context Update In Progress  
-**Milestones Completed**: Specification, Research, Design & Contracts  
-**Next Phase**: Task Generation (`/speckit.tasks` command) → Implementation
+After Phase 1 design completes, verify:
+- ✅ Data model aligns with spec requirements (all 6 user stories represented)
+- ✅ Contracts document agent API surface required for testability
+- ✅ Quickstart covers setup and sample flow with real handbook
+- ✅ No skeleton parity issues (Python-native patterns used throughout)

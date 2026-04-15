@@ -101,8 +101,16 @@ The customer interaction feels like a single, coherent conversation with the sup
 **Acceptance Scenarios**:
 
 1. **Given** the app needs clarification, **When** it responds, **Then** the message is clear and specific (not generic), explains why the info is needed, and frames it as part of solving the customer's problem
-2. **Given** the app is escalating to human support, **When** it responds, **Then** it summarizes what the app understood, why escalation is needed, and sets expectations for next steps (e.g., "A specialist will review your case and follow up within 2 hours")
+2. **Given** the app is escalating to human support, **When** it responds, **Then** it summarizes what the app understood, why escalation is needed, and sets expectations for next steps (e.g., "A specialist will review your case and follow up within 4 business hours")
 3. **Given** the app is providing a direct answer (refund approval, billing explanation, etc.), **When** it responds, **Then** the message feels personalized to the customer's situation, not a template response
+
+---
+
+## Clarifications
+
+### Session 2026-04-15
+
+- Q: Escalation follow-up SLA expectation: should the spec reference 2 hours (as currently written), 4 business hours (align with handbook context), or no explicit timing? → A: Changed to 4 business hours (aligns with handbook support context and is more realistic for specialist review and follow-up).
 
 ---
 
