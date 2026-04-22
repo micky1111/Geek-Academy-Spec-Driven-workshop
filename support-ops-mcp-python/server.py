@@ -5,9 +5,18 @@ from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI(title="SupportOps MCP Server", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 _CUSTOMERS_PATH = (
     Path(__file__).resolve().parent.parent / "mock-data-lab2" / "mock_customers.json"
@@ -161,6 +170,11 @@ def _call_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
         return _tool_call_result(record)
 
     raise ValueError(f"Unknown tool: {name}")
+
+
+@app.get("/")
+async def root() -> dict[str, str]:
+    return {"status": "ok", "endpoint": "/mcp"}
 
 
 @app.post("/mcp")
